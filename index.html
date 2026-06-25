@@ -468,6 +468,7 @@ function showLoader(m){ let el=document.getElementById('loaderBar');if(!el){el=d
 function hideLoader(){ const el=document.getElementById('loaderBar');if(el)el.style.display='none'; }
 
 async function apiCall(payload){
+  // Guardar localmente primero como respaldo inmediato
   guardarLocal();
   if(!GAS_CONFIGURADO) return { ok:true };
   try{
@@ -488,32 +489,46 @@ async function apiCall(payload){
 }
 
 async function cargarDatos(){
-  const hayLocal = cargarLocal();
-  if(hayLocal){ recalcNid(); renderConcentrado(); }
-  if(!GAS_CONFIGURADO){ if(!hayLocal) renderConcentrado(); return; }
+  // 1. Cargar siempre desde localStorage primero — datos aparecen de inmediato
+  //    y NUNCA se pierden al recargar la página.
+  cargarLocal();
+  recalcNid();
+  renderConcentrado();
+
+  // 2. Sin GAS configurado: localStorage es la única fuente de verdad.
+  if(!GAS_CONFIGURADO) return;
+
+  // 3. Con GAS: sincronizar en segundo plano sin borrar lo que ya hay.
   showLoader('🔄 Sincronizando con Google Sheets…');
   try{
     const r = await fetch(GAS_URL+'?action=getAll');
     const data = await r.json();
     if(data && typeof data==='object'){
       ['manos','cvc','foley','nav'].forEach(s=>{
-        if(Array.isArray(data[s])){
-          DB[s] = data[s].map(rec=>{
-            // Normalizar booleanos que Sheets puede devolver como string
-            const bools=['m1','m2','m3','m4','m5','m6','m7','i1','i2','i3','i4','i5','correcto'];
-            bools.forEach(b=>{ if(rec[b]==='TRUE'||rec[b]==='true'||rec[b]===1) rec[b]=true; else if(rec[b]==='FALSE'||rec[b]==='false'||rec[b]===0||rec[b]==='') rec[b]=false; });
-            if(rec.mes!==undefined) rec.mes=parseInt(rec.mes)||0;
-            if(rec.id!==undefined) rec.id=parseInt(rec.id)||rec.id;
-            return rec;
+        if(!Array.isArray(data[s])) return;
+        // Solo reemplazar si Sheets devuelve registros reales
+        // (evita borrar datos locales con un array vacío si Sheets falla)
+        if(data[s].length === 0) return;
+        DB[s] = data[s].map(rec=>{
+          const bools=['m1','m2','m3','m4','m5','m6','m7','i1','i2','i3','i4','i5','correcto'];
+          bools.forEach(b=>{
+            if(rec[b]==='TRUE'||rec[b]==='true'||rec[b]===1||rec[b]==='1') rec[b]=true;
+            else if(rec[b]==='FALSE'||rec[b]==='false'||rec[b]===0||rec[b]==='0'||rec[b]==='') rec[b]=false;
           });
-        }
+          if(rec.mes!==undefined) rec.mes=parseInt(rec.mes)||0;
+          if(rec.id!==undefined) rec.id=parseInt(rec.id)||rec.id;
+          return rec;
+        });
       });
       recalcNid();
       guardarLocal();
+      renderConcentrado();
     }
-  }catch(e){ console.error('Error cargando GAS:', e); }
+  }catch(e){
+    // Error de red: los datos locales ya están cargados y visibles, no se pierde nada
+    console.error('Error cargando GAS:', e);
+  }
   hideLoader();
-  renderConcentrado();
 }
 
 function recalcNid(){
