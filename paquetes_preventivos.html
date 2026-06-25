@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0F2942">
+<title>Paquetes Preventivos — CMGA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --az:#0F2942;--az2:#1B4F82;--az3:#EBF2FB;--az4:#D1E4F6;
+  --verde:#14532D;--verde2:#16A34A;--verde3:#DCFCE7;
+  --rojo:#991B1B;--rojo2:#EF4444;--rojo3:#FEE2E2;
+  --naranja:#9A3412;--naranja2:#F97316;--naranja3:#FFEDD5;
+  --amarillo:#854D0E;--amarillo2:#EAB308;--amarillo3:#FEF9C3;
+  --morado:#6B21A8;--morado2:#A855F7;--morado3:#F3E8FF;
+  --cyan:#164E63;--cyan2:#06B6D4;--cyan3:#CFFAFE;
+  --gris0:#F8FAFC;--gris1:#F1F5F9;--gris2:#E2E8F0;
+  --gris3:#CBD5E1;--gris4:#94A3B8;--gris5:#64748B;--gris6:#334155;--gris7:#1E293B;
+  --txt:#0F172A;--r:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--gris0);color:var(--txt);font-size:14px;min-height:100vh}
+nav{background:var(--az);padding:0 16px;display:flex;align-items:center;gap:0;height:54px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.logo{color:#fff;font-weight:600;font-size:15px;margin-right:16px;display:flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0}
+.logo-icon{width:28px;height:28px;background:rgba(255,255,255,.15);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.nav-tabs{display:flex;gap:2px;flex:1;overflow-x:auto}
+.nav-tab{color:rgba(255,255,255,.65);padding:7px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;border:none;background:none;white-space:nowrap;font-family:inherit}
+.nav-tab:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-tab.active{background:rgba(255,255,255,.18);color:#fff}
+.page{display:none;padding:18px;max-width:1340px;margin:0 auto}
+.page.active{display:block}
+
+/* ── CARDS ── */
+.card{background:#fff;border:1px solid var(--gris2);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:14px}
+.card-header{padding:11px 16px;border-bottom:1px solid var(--gris2);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--gris0);border-radius:var(--r) var(--r) 0 0}
+.card-title{font-weight:600;font-size:13px;color:var(--gris7);display:flex;align-items:center;gap:7px}
+.card-body{padding:16px}
+
+/* ── SEMAFORO ── */
+.sem-verde {background:var(--verde3);color:var(--verde);font-weight:700}
+.sem-amarillo{background:var(--amarillo3);color:var(--amarillo);font-weight:700}
+.sem-rojo {background:var(--rojo3);color:var(--rojo);font-weight:700}
+
+/* ── TOP BAR ── */
+.top-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.page-title{font-size:17px;font-weight:700;color:var(--gris7)}
+.page-sub{font-size:12px;color:var(--gris4);font-weight:400}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;gap:10px;margin-bottom:14px}
+.stats-4{grid-template-columns:repeat(4,1fr)}
+.stats-3{grid-template-columns:repeat(3,1fr)}
+.stat-card{background:#fff;border:1px solid var(--gris2);border-radius:var(--r);padding:13px 15px;box-shadow:var(--shadow)}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--gris4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.stat-val{font-size:28px;font-weight:700;line-height:1}
+.stat-sub{font-size:11px;color:var(--gris4);margin-top:3px}
+
+/* ── GAUGE ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:12px 0}
+.gauge-arc{position:relative;width:140px;height:72px;overflow:hidden;margin-bottom:6px}
+.gauge-arc svg{position:absolute;top:0;left:0}
+.gauge-pct{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:700;white-space:nowrap}
+.gauge-lbl{font-size:10px;font-weight:700;color:var(--gris5);text-transform:uppercase;letter-spacing:.05em;text-align:center}
+.gauge-meta{font-size:10px;color:var(--gris4);text-align:center;margin-top:2px}
+
+/* ── PROGRESS BARS ── */
+.prog-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gris1)}
+.prog-row:last-child{border-bottom:none}
+.prog-lbl{font-size:11px;color:var(--gris6);flex:1;min-width:0}
+.prog-bar-wrap{width:100px;height:7px;background:var(--gris2);border-radius:99px;overflow:hidden;flex-shrink:0}
+.prog-bar-fill{height:100%;border-radius:99px;transition:width .4s}
+.prog-val{font-size:11px;font-weight:700;min-width:34px;text-align:right;flex-shrink:0}
+
+/* ── FORM ── */
+.form-grid{display:grid;gap:10px}
+.fg-2{grid-template-columns:1fr 1fr}
+.fg-3{grid-template-columns:1fr 1fr 1fr}
+.fg-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:3px}
+.form-group.full{grid-column:1/-1}
+label{font-size:10px;font-weight:600;color:var(--gris5);text-transform:uppercase;letter-spacing:.04em}
+input,select,textarea{padding:7px 10px;border:1px solid var(--gris3);border-radius:7px;font-family:inherit;font-size:13px;color:var(--txt);background:#fff;transition:border .15s;outline:none;width:100%}
+input:focus,select:focus{border-color:var(--az2);box-shadow:0 0 0 3px rgba(27,79,130,.1)}
+.section-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris4);padding:12px 0 8px;border-bottom:1px solid var(--gris2);margin-bottom:10px;margin-top:6px;grid-column:1/-1}
+
+/* ── TOGGLE CHECKS ── */
+.check-grupo{display:grid;gap:8px;margin:10px 0}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--gris2);border-radius:8px;cursor:pointer;transition:background .12s,border .12s;background:#fff}
+.check-item:hover{background:var(--gris0)}
+.check-item.checked{background:var(--verde3);border-color:#86EFAC}
+.check-item.unchecked{background:var(--rojo3);border-color:#FECACA}
+.check-item input[type=checkbox]{width:18px;height:18px;margin-top:1px;flex-shrink:0;cursor:pointer;accent-color:var(--verde2)}
+.check-code{font-size:11px;font-weight:700;color:var(--az2);flex-shrink:0;min-width:28px;margin-top:1px}
+.check-txt{font-size:12px;color:var(--gris6);line-height:1.4}
+.check-txt strong{color:var(--gris7);display:block;margin-bottom:2px}
+
+/* ── TABLA ── */
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--gris2)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--gris1);padding:7px 10px;text-align:left;font-weight:600;font-size:10px;color:var(--gris5);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--gris2);white-space:nowrap;position:sticky;top:0}
+tbody tr{border-bottom:1px solid var(--gris1);transition:background .1s}
+tbody tr:hover{background:var(--gris0)}
+tbody td{padding:8px 10px;color:var(--gris6);vertical-align:middle}
+tbody tr:last-child{border-bottom:none}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700}
+.b-verde{background:var(--verde3);color:var(--verde)}
+.b-rojo{background:var(--rojo3);color:var(--rojo)}
+.b-amarillo{background:var(--amarillo3);color:var(--amarillo)}
+
+/* ── BTNS ── */
+.btn{padding:7px 14px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--az);color:#fff}.btn-primary:hover{background:var(--az2)}
+.btn-success{background:#15803D;color:#fff}.btn-success:hover{background:var(--verde)}
+.btn-ghost{background:transparent;color:var(--gris5);border:1px solid var(--gris3)}.btn-ghost:hover{background:var(--gris1)}
+.btn-danger{background:var(--rojo3);color:var(--rojo);border:1px solid #FECACA}.btn-danger:hover{background:#FECACA}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid var(--gris2);flex-wrap:wrap}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:200}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:18px 18px 0 0;padding:20px;width:100%;max-width:740px;max-height:92vh;overflow-y:auto}
+@media(min-width:700px){.modal-bg{align-items:center;padding:1rem}.modal{border-radius:14px}}
+.modal-handle{width:36px;height:4px;background:var(--gris3);border-radius:2px;margin:0 auto 14px}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--gris4);font-size:22px;line-height:1}
+
+/* ── PIN ── */
+.pin-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:500}
+.pin-modal.open{display:flex}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--gris7);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.2);transform:translateY(70px);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);z-index:999;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#15803D}
+.toast.error{background:var(--rojo)}
+
+/* ── MONTH GRID ── */
+.mes-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.mes-card{background:#fff;border:2px solid var(--gris2);border-radius:9px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s}
+.mes-card:hover{border-color:var(--az2);background:var(--az3)}
+.mes-card.activo{border-color:var(--az2);background:var(--az3)}
+.mes-card .mes-nom{font-size:11px;font-weight:600;color:var(--gris6)}
+.mes-card .mes-pct{font-size:18px;font-weight:700;margin:3px 0}
+.mes-card .mes-dot{width:8px;height:8px;border-radius:50%;margin:0 auto}
+
+/* ── TABS within page ── */
+.inner-tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:2px solid var(--gris2);padding-bottom:0}
+.inner-tab{padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--gris5);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.inner-tab.active{color:var(--az2);border-bottom-color:var(--az2);font-weight:600}
+.inner-panel{display:none}.inner-panel.active{display:block}
+
+/* ── CONCENTRADO RESUMEN ── */
+.paq-card{background:#fff;border:1px solid var(--gris2);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:all .15s}
+.paq-card:hover{border-color:var(--az2);box-shadow:0 4px 12px rgba(27,79,130,.12)}
+.paq-card-header{display:flex;align-items:center;gap:10px}
+.paq-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.paq-title{font-size:14px;font-weight:600;color:var(--gris7)}
+.paq-sub{font-size:11px;color:var(--gris4)}
+.paq-pct-big{font-size:36px;font-weight:700;line-height:1}
+.paq-bar{height:6px;background:var(--gris2);border-radius:99px;overflow:hidden}
+.paq-bar-fill{height:100%;border-radius:99px;transition:width .5s}
+
+/* ── ADHERENCIA POR MEDIDA ── */
+.medida-grid{display:grid;gap:6px}
+.medida-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 10px;background:var(--gris0);border-radius:7px;border:1px solid var(--gris2)}
+.medida-code{font-size:10px;font-weight:700;color:var(--az2);white-space:nowrap}
+.medida-lbl{font-size:11px;color:var(--gris6)}
+.medida-pct{font-size:13px;font-weight:700;white-space:nowrap}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .stats-4,.stats-3{grid-template-columns:1fr 1fr}
+  .fg-3,.fg-4{grid-template-columns:1fr 1fr}
+  .mes-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-icon">🛡</div>Paquetes Preventivos</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('concentrado',this)">📊 Concentrado</button>
+    <button class="nav-tab" onclick="showPage('manos',this)">🖐 Higiene de Manos</button>
+    <button class="nav-tab" onclick="showPage('cvc',this)">💉 Paquete CVC</button>
+    <button class="nav-tab" onclick="showPage('foley',this)">🩺 Paquete Foley</button>
+    <button class="nav-tab" onclick="showPage('nav',this)">💨 Paquete NAV</button>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;padding-left:10px;flex-shrink:0">
+    <span id="modeLabel" style="background:var(--amarillo3);color:var(--amarillo);padding:4px 10px;border-radius:99px;font-size:11px;font-weight:500">Solo lectura</span>
+    <button id="lockBtn" onclick="toggleLock()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit">🔒 PIN</button>
+  </div>
+</nav>
+
+<!-- PIN MODAL -->
+<div class="pin-modal" id="pinModal">
+  <div style="background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:320px;text-align:center">
+    <div style="font-size:36px;margin-bottom:10px">🔐</div>
+    <div style="font-size:17px;font-weight:600;margin-bottom:6px">Acceso de edición</div>
+    <div style="font-size:13px;color:var(--gris4);margin-bottom:18px">Ingresa el PIN para registrar evaluaciones</div>
+    <input id="pinInput" type="password" maxlength="6" placeholder="••••••" onkeydown="if(event.key==='Enter')verifyPin()"
+      style="width:100%;padding:12px;font-size:20px;text-align:center;border:2px solid var(--gris3);border-radius:10px;font-family:'DM Mono',monospace;letter-spacing:.3em;margin-bottom:14px;outline:none">
+    <div id="pinError" style="color:var(--rojo);font-size:12px;margin-bottom:10px;min-height:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closePinModal()" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--gris3);background:transparent;cursor:pointer;font-family:inherit;font-size:13px">Cancelar</button>
+      <button onclick="verifyPin()" style="flex:1;padding:9px;border-radius:8px;border:none;background:var(--az);color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CONCENTRADO ══════════ -->
+<div class="page active" id="page-concentrado">
+  <div class="top-bar">
+    <div>
+      <div class="page-title">📊 Concentrado General</div>
+      <div class="page-sub">Adherencia global a paquetes preventivos — <span id="dash-anio">2026</span></div>
+    </div>
+    <select id="dash-mes" onchange="renderConcentrado()" style="padding:7px 10px;font-size:12px;border-radius:7px;border:1px solid var(--gris3);font-family:inherit;margin-left:auto">
+      <option value="-1">Todos los meses</option>
+      <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+      <option value="3">Abril</option><option value="4">Mayo</option><option value="5" selected>Junio</option>
+      <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+      <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+    </select>
+  </div>
+
+  <!-- Tarjetas grandes de los 4 paquetes -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px" id="dash-paq-grid"></div>
+
+  <!-- Semaforo anual por mes -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📅 Semáforo anual — Adherencia mensual por paquete</span></div>
+    <div class="card-body">
+      <div id="dash-semaforo-anual"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ HIGIENE DE MANOS ══════════ -->
+<div class="page" id="page-manos">
+  <div class="top-bar">
+    <div>
+      <div class="page-title">🖐 Higiene de Manos</div>
+      <div class="page-sub">OMS 5 Momentos · Meta ≥80%</div>
+    </div>
+    <select id="manos-mes" onchange="renderManos()" style="padding:7px 10px;font-size:12px;border-radius:7px;border:1px solid var(--gris3);font-family:inherit">
+      <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+      <option value="3">Abril</option><option value="4">Mayo</option><option value="5" selected>Junio</option>
+      <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+      <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="requirePin(()=>abrirModalManos())">+ Registrar observación</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV('manos')">↓ CSV</button>
+  </div>
+
+  <div class="stats-grid stats-4" id="manos-stats"></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card" id="manos-momentos-card">
+      <div class="card-header"><span class="card-title">5 Momentos OMS</span></div>
+      <div class="card-body" id="manos-momentos"></div>
+    </div>
+    <div class="card" id="manos-area-card">
+      <div class="card-header"><span class="card-title">Por Área / Servicio</span></div>
+      <div class="card-body" id="manos-area"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📋 Registros del mes</span>
+      <span id="manos-count" style="font-size:12px;color:var(--gris4)"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Fecha</th><th>Área</th><th>Personal</th><th>Técnica</th>
+          <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th>
+          <th>¿Correcto?</th><th>Notas</th><th></th>
+        </tr></thead>
+        <tbody id="manos-tbody"></tbody>
+      </table>
+      <div id="manos-empty" style="text-align:center;padding:30px;color:var(--gris4);display:none">
+        <div style="font-size:26px;margin-bottom:6px">🖐</div>Sin observaciones registradas
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CVC ══════════ -->
+<div class="page" id="page-cvc">
+  <div class="top-bar">
+    <div>
+      <div class="page-title">💉 Paquete CVC</div>
+      <div class="page-sub">Catéter Venoso Central · Meta adherencia ≥90%</div>
+    </div>
+    <select id="cvc-mes" onchange="renderCVC()" style="padding:7px 10px;font-size:12px;border-radius:7px;border:1px solid var(--gris3);font-family:inherit">
+      <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+      <option value="3">Abril</option><option value="4">Mayo</option><option value="5" selected>Junio</option>
+      <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+      <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="requirePin(()=>abrirModalBundle('cvc'))">+ Registrar evaluación</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV('cvc')">↓ CSV</button>
+  </div>
+  <div class="stats-grid stats-4" id="cvc-stats"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card"><div class="card-header"><span class="card-title">Medidas de Inserción (I1–I5)</span></div><div class="card-body" id="cvc-insercion"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Medidas de Mantenimiento (M1–M5)</span></div><div class="card-body" id="cvc-manten"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📋 Registros del mes</span><span id="cvc-count" style="font-size:12px;color:var(--gris4)"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Fecha</th><th>F.Colocación</th><th>Hab.</th><th>Paciente</th><th>Servicio</th><th>Turno</th><th>Personal</th><th>Días CVC</th>
+          <th>I1</th><th>I2</th><th>I3</th><th>I4</th><th>I5</th>
+          <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th>
+          <th>Adherencia</th><th>Notas</th><th></th>
+        </tr></thead>
+        <tbody id="cvc-tbody"></tbody>
+      </table>
+      <div id="cvc-empty" style="text-align:center;padding:30px;color:var(--gris4);display:none"><div style="font-size:26px;margin-bottom:6px">💉</div>Sin registros</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ FOLEY ══════════ -->
+<div class="page" id="page-foley">
+  <div class="top-bar">
+    <div>
+      <div class="page-title">🩺 Paquete Foley</div>
+      <div class="page-sub">Sonda Foley / Catéter Urinario · Meta adherencia ≥90%</div>
+    </div>
+    <select id="foley-mes" onchange="renderFoley()" style="padding:7px 10px;font-size:12px;border-radius:7px;border:1px solid var(--gris3);font-family:inherit">
+      <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+      <option value="3">Abril</option><option value="4">Mayo</option><option value="5" selected>Junio</option>
+      <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+      <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="requirePin(()=>abrirModalBundle('foley'))">+ Registrar evaluación</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV('foley')">↓ CSV</button>
+  </div>
+  <div class="stats-grid stats-4" id="foley-stats"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card"><div class="card-header"><span class="card-title">Medidas de Inserción (I1–I4)</span></div><div class="card-body" id="foley-insercion"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Medidas de Mantenimiento (M1–M5)</span></div><div class="card-body" id="foley-manten"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📋 Registros del mes</span><span id="foley-count" style="font-size:12px;color:var(--gris4)"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Fecha</th><th>F.Inserción</th><th>Hab.</th><th>Paciente</th><th>Servicio</th><th>Turno</th><th>Personal</th><th>Días Sonda</th>
+          <th>I1</th><th>I2</th><th>I3</th><th>I4</th>
+          <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th>
+          <th>Adherencia</th><th>Notas</th><th></th>
+        </tr></thead>
+        <tbody id="foley-tbody"></tbody>
+      </table>
+      <div id="foley-empty" style="text-align:center;padding:30px;color:var(--gris4);display:none"><div style="font-size:26px;margin-bottom:6px">🩺</div>Sin registros</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<div class="page" id="page-nav">
+  <div class="top-bar">
+    <div>
+      <div class="page-title">💨 Paquete NAV</div>
+      <div class="page-sub">Neumonía Asociada al Ventilador · Meta adherencia ≥90%</div>
+    </div>
+    <select id="nav-mes" onchange="renderNAV()" style="padding:7px 10px;font-size:12px;border-radius:7px;border:1px solid var(--gris3);font-family:inherit">
+      <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+      <option value="3">Abril</option><option value="4">Mayo</option><option value="5" selected>Junio</option>
+      <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+      <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="requirePin(()=>abrirModalBundle('nav'))">+ Registrar evaluación</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV('nav')">↓ CSV</button>
+  </div>
+  <div class="stats-grid stats-4" id="nav-stats"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card"><div class="card-header"><span class="card-title">Medidas de Inicio VM (I1–I3)</span></div><div class="card-body" id="nav-insercion"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Medidas de Mantenimiento (M1–M7)</span></div><div class="card-body" id="nav-manten"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">📋 Registros del mes</span><span id="nav-count" style="font-size:12px;color:var(--gris4)"></span></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Fecha</th><th>F.Inicio VM</th><th>Hab.</th><th>Paciente</th><th>Servicio</th><th>Turno</th><th>Personal</th><th>Días VM</th>
+          <th>I1</th><th>I2</th><th>I3</th>
+          <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th><th>M7</th>
+          <th>Adherencia</th><th>Notas</th><th></th>
+        </tr></thead>
+        <tbody id="nav-tbody"></tbody>
+      </table>
+      <div id="nav-empty" style="text-align:center;padding:30px;color:var(--gris4);display:none"><div style="font-size:26px;margin-bottom:6px">💨</div>Sin registros</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MANOS -->
+<div class="modal-bg" id="modalManos" onclick="if(event.target===this)closeModal('modalManos')">
+  <div class="modal"><div class="modal-handle"></div><div id="modalManosContent"></div></div>
+</div>
+
+<!-- MODAL BUNDLE (CVC / Foley / NAV) -->
+<div class="modal-bg" id="modalBundle" onclick="if(event.target===this)closeModal('modalBundle')">
+  <div class="modal"><div class="modal-handle"></div><div id="modalBundleContent"></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN
+// ══════════════════════════════════════════════════════════════════════
+const PIN = 'CENSO1';
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const GAS_URL = 'TU_URL_AQUI'; // ← Pega aquí tu URL de Apps Script
+const GAS_CONFIGURADO = GAS_URL !== 'TU_URL_AQUI';
+let pinOK = false, pinCB = null;
+let nid = 1;
+
+// Base de datos local
+// manos: {id, mes, area, personal, tecnica, m1,m2,m3,m4,m5, correcto, notas, fecha}
+// cvc:   {id, mes, fecha, fechaColocacion, hab, paciente, servicio, turno, personal, diasCVC, i1..i5, m1..m5, adherencia, notas}
+// foley: {id, mes, fecha, fechaInsercion, hab, paciente, servicio, turno, personal, diasSonda, i1..i4, m1..m5, adherencia, notas}
+// nav:   {id, mes, fecha, fechaVM, hab, paciente, servicio, turno, personal, diasVM, i1..i3, m1..m7, adherencia, notas}
+let DB = { manos:[], cvc:[], foley:[], nav:[] };
+
+// ── UTILS ──────────────────────────────────────────────────────────────
+function toast(msg, tipo='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show '+tipo;
+  setTimeout(()=>t.className='toast', 3000);
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function requirePin(cb){ if(pinOK){cb();return;} pinCB=cb; document.getElementById('pinInput').value=''; document.getElementById('pinError').textContent=''; document.getElementById('pinModal').classList.add('open'); setTimeout(()=>document.getElementById('pinInput').focus(),100); }
+function verifyPin(){
+  if(document.getElementById('pinInput').value===PIN){
+    pinOK=true; document.getElementById('pinModal').classList.remove('open');
+    document.getElementById('modeLabel').innerHTML='✏ Editor';
+    document.getElementById('modeLabel').style.cssText='background:var(--verde3);color:var(--verde);padding:4px 10px;border-radius:99px;font-size:11px;font-weight:500';
+    document.getElementById('lockBtn').textContent='🔓 Salir';
+    toast('Modo edición activado');
+    if(pinCB){pinCB();pinCB=null;}
+  } else { document.getElementById('pinError').textContent='PIN incorrecto'; document.getElementById('pinInput').value=''; }
+}
+function closePinModal(){ document.getElementById('pinModal').classList.remove('open'); pinCB=null; }
+function toggleLock(){
+  if(pinOK){ pinOK=false; document.getElementById('modeLabel').innerHTML='Solo lectura'; document.getElementById('modeLabel').style.cssText='background:var(--amarillo3);color:var(--amarillo);padding:4px 10px;border-radius:99px;font-size:11px;font-weight:500'; document.getElementById('lockBtn').textContent='🔒 PIN'; toast('Modo solo lectura'); }
+  else { requirePin(()=>{}); }
+}
+function guardarLocal(){ try{ localStorage.setItem('paquetes_db_v1', JSON.stringify({db:DB,nid})); }catch(e){} }
+function cargarLocal(){ try{ const r=localStorage.getItem('paquetes_db_v1'); if(!r) return false; const p=JSON.parse(r); if(p.db) Object.keys(DB).forEach(k=>{ if(Array.isArray(p.db[k])) DB[k]=p.db[k]; }); if(p.nid) nid=p.nid; return true; }catch(e){return false;} }
+
+function showLoader(m){ let el=document.getElementById('loaderBar');if(!el){el=document.createElement('div');el.id='loaderBar';el.style.cssText='position:fixed;top:54px;left:0;right:0;background:#1B4F82;color:#fff;text-align:center;padding:6px;font-size:12px;z-index:300';document.body.appendChild(el);}el.textContent=m;el.style.display='block'; }
+function hideLoader(){ const el=document.getElementById('loaderBar');if(el)el.style.display='none'; }
+
+async function apiCall(payload){
+  guardarLocal();
+  if(!GAS_CONFIGURADO) return { ok:true };
+  try{
+    const params = new URLSearchParams();
+    params.append('action', payload.action);
+    params.append('section', payload.section||'');
+    if(payload.record) params.append('record', JSON.stringify(payload.record));
+    if(payload.id !== undefined) params.append('id', payload.id);
+    const r = await fetch(GAS_URL+'?'+params.toString());
+    const data = await r.json();
+    if(data.ok) guardarLocal();
+    return data;
+  }catch(e){
+    console.error('Error GAS:', e);
+    toast('⚠ Sin conexión — guardado localmente','error');
+    return { ok:false };
+  }
+}
+
+async function cargarDatos(){
+  const hayLocal = cargarLocal();
+  if(hayLocal){ recalcNid(); renderConcentrado(); }
+  if(!GAS_CONFIGURADO){ if(!hayLocal) renderConcentrado(); return; }
+  showLoader('🔄 Sincronizando con Google Sheets…');
+  try{
+    const r = await fetch(GAS_URL+'?action=getAll');
+    const data = await r.json();
+    if(data && typeof data==='object'){
+      ['manos','cvc','foley','nav'].forEach(s=>{
+        if(Array.isArray(data[s])){
+          DB[s] = data[s].map(rec=>{
+            // Normalizar booleanos que Sheets puede devolver como string
+            const bools=['m1','m2','m3','m4','m5','m6','m7','i1','i2','i3','i4','i5','correcto'];
+            bools.forEach(b=>{ if(rec[b]==='TRUE'||rec[b]==='true'||rec[b]===1) rec[b]=true; else if(rec[b]==='FALSE'||rec[b]==='false'||rec[b]===0||rec[b]==='') rec[b]=false; });
+            if(rec.mes!==undefined) rec.mes=parseInt(rec.mes)||0;
+            if(rec.id!==undefined) rec.id=parseInt(rec.id)||rec.id;
+            return rec;
+          });
+        }
+      });
+      recalcNid();
+      guardarLocal();
+    }
+  }catch(e){ console.error('Error cargando GAS:', e); }
+  hideLoader();
+  renderConcentrado();
+}
+
+function recalcNid(){
+  const allIds=[...DB.manos,...DB.cvc,...DB.foley,...DB.nav].map(x=>Number(x.id)||0);
+  nid = allIds.length ? Math.max(...allIds)+1 : 1;
+}
+
+function semColor(pct, meta=90){ return pct>=meta?'var(--verde2)':pct>=70?'var(--amarillo2)':'var(--rojo2)'; }
+function semBadge(pct, meta=90){ const cls=pct>=meta?'b-verde':pct>=70?'b-amarillo':'b-rojo'; const icon=pct>=meta?'🟢':pct>=70?'🟡':'🔴'; return `<span class="badge ${cls}">${icon} ${pct}%</span>`; }
+function pctCalc(si, total){ return total>0?Math.round(si/total*100):null; }
+function fmtF(f){ if(!f) return '—'; try{ return new Date(f+'T12:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short'}); }catch(e){return f;} }
+function calcDias(desde){ if(!desde) return '—'; const d=Math.max(0,Math.round((new Date()-new Date(desde+'T12:00'))/86400000)); return d+' d'; }
+
+// ── CHECK CELL ─────────────────────────────────────────────────────────
+function checkCell(v){ return v?'<span style="color:var(--verde2);font-weight:700;font-size:13px">✓</span>':'<span style="color:var(--rojo2);font-weight:700;font-size:13px">✗</span>'; }
+
+// ── PROGRESS BAR HELPER ────────────────────────────────────────────────
+function progRow(label, si, total, meta=null){
+  const pct = total>0?Math.round(si/total*100):0;
+  const color = meta!=null? semColor(pct,meta) : 'var(--az2)';
+  return `<div class="prog-row">
+    <span class="prog-lbl">${label}</span>
+    <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="prog-val" style="color:${color}">${total>0?pct+'%':'—'}</span>
+  </div>`;
+}
+
+// ── GAUGE SVG ──────────────────────────────────────────────────────────
+function gauge(pct, meta=90, label=''){
+  if(pct===null) pct=0;
+  const color = semColor(pct, meta);
+  const angle = Math.min(pct/100*180, 180);
+  const r=60, cx=70, cy=68;
+  const rad = (angle-180)*Math.PI/180;
+  const x = cx + r*Math.cos(rad);
+  const y = cy + r*Math.sin(rad);
+  const largeArc = angle>180?1:0;
+  return `<div class="gauge-wrap">
+    <div class="gauge-arc">
+      <svg width="140" height="72" viewBox="0 0 140 72">
+        <path d="M10,68 A60,60 0 0,1 130,68" fill="none" stroke="var(--gris2)" stroke-width="10" stroke-linecap="round"/>
+        ${pct>0?`<path d="M10,68 A60,60 0 ${largeArc},1 ${x.toFixed(1)},${y.toFixed(1)}" fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"/>`:''}
+      </svg>
+      <div class="gauge-pct" style="color:${color}">${pct}%</div>
+    </div>
+    <div class="gauge-lbl">${label}</div>
+    <div class="gauge-meta">Meta ≥${meta}%</div>
+  </div>`;
+}
+
+// ── STAT CARD HELPER ───────────────────────────────────────────────────
+function statCard(lbl, val, sub, color='var(--az2)'){
+  return `<div class="stat-card"><div class="stat-lbl">${lbl}</div><div class="stat-val" style="color:${color}">${val}</div><div class="stat-sub">${sub}</div></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ══════════════════════════════════════════════════════════════════════
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='concentrado') renderConcentrado();
+  if(id==='manos') renderManos();
+  if(id==='cvc') renderCVC();
+  if(id==='foley') renderFoley();
+  if(id==='nav') renderNAV();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// CONCENTRADO
+// ══════════════════════════════════════════════════════════════════════
+function calcAdherencia(arr, mes, campos){
+  const data = mes>=0 ? arr.filter(r=>r.mes===mes) : arr;
+  if(!data.length) return null;
+  let si=0, total=0;
+  data.forEach(r=>{ campos.forEach(c=>{ if(r[c]!==undefined){ total++; if(r[c]) si++; } }); });
+  return pctCalc(si, total);
+}
+
+function renderConcentrado(){
+  const mes = parseInt(document.getElementById('dash-mes').value);
+  const paquetes = [
+    { id:'manos', label:'Higiene de Manos', icon:'🖐', color:'var(--az)', bg:'var(--az3)', meta:80,
+      campos:['correcto'], contarReg: arr=>arr.length,
+      desc:'OMS 5 Momentos' },
+    { id:'cvc', label:'Paquete CVC', icon:'💉', color:'var(--morado)', bg:'var(--morado3)', meta:90,
+      campos:['i1','i2','i3','i4','i5','m1','m2','m3','m4','m5'],
+      desc:'Catéter Venoso Central' },
+    { id:'foley', label:'Paquete Foley', icon:'🩺', color:'var(--naranja)', bg:'var(--naranja3)', meta:90,
+      campos:['i1','i2','i3','i4','m1','m2','m3','m4','m5'],
+      desc:'Sonda Foley' },
+    { id:'nav', label:'Paquete NAV', icon:'💨', color:'var(--rojo)', bg:'var(--rojo3)', meta:90,
+      campos:['i1','i2','i3','m1','m2','m3','m4','m5','m6','m7'],
+      desc:'Neumonía Asociada al Ventilador' },
+  ];
+
+  const grid = document.getElementById('dash-paq-grid');
+  grid.innerHTML = paquetes.map(p=>{
+    const data = mes>=0 ? DB[p.id].filter(r=>r.mes===mes) : DB[p.id];
+    const pct = calcAdherencia(DB[p.id], mes, p.campos);
+    const n = data.length;
+    const color = pct!==null ? semColor(pct, p.meta) : 'var(--gris4)';
+    const barW = pct!==null ? pct : 0;
+    return `<div class="paq-card" onclick="showPage('${p.id}',document.querySelector('[onclick*=\\'${p.id}\\']'))">
+      <div class="paq-card-header">
+        <div class="paq-icon" style="background:${p.bg}">${p.icon}</div>
+        <div><div class="paq-title">${p.label}</div><div class="paq-sub">${p.desc} · Meta ≥${p.meta}%</div></div>
+        <div style="margin-left:auto">${semBadge(pct!==null?pct:0, p.meta)}</div>
+      </div>
+      <div class="paq-pct-big" style="color:${color}">${pct!==null?pct+'%':'Sin datos'}</div>
+      <div class="paq-bar"><div class="paq-bar-fill" style="width:${barW}%;background:${color}"></div></div>
+      <div style="font-size:11px;color:var(--gris4)">${n} evaluación${n!==1?'es':''} · ${mes>=0?MESES[mes]:'Año completo'}</div>
+    </div>`;
+  }).join('');
+
+  // Semáforo anual mensual
+  const sem = document.getElementById('dash-semaforo-anual');
+  sem.innerHTML = paquetes.map(p=>{
+    const dots = MESES.map((m,i)=>{
+      const pct = calcAdherencia(DB[p.id], i, p.campos);
+      const n = (DB[p.id].filter(r=>r.mes===i)).length;
+      const color = pct!==null ? semColor(pct,p.meta) : 'var(--gris3)';
+      const txt = pct!==null ? pct+'%' : '—';
+      return `<div style="text-align:center;cursor:pointer" title="${m}: ${txt} (${n} reg.)">
+        <div style="width:10px;height:10px;border-radius:50%;background:${color};margin:0 auto 3px"></div>
+        <div style="font-size:9px;color:var(--gris4)">${m.slice(0,3)}</div>
+        <div style="font-size:10px;font-weight:600;color:${color}">${txt}</div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--gris6);margin-bottom:8px">${p.icon} ${p.label}</div>
+      <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px">${dots}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// HIGIENE DE MANOS
+// ══════════════════════════════════════════════════════════════════════
+const MANOS_MOMENTOS = [
+  {key:'m1', lbl:'M1 — Antes de tocar al paciente'},
+  {key:'m2', lbl:'M2 — Antes de proc. aséptico'},
+  {key:'m3', lbl:'M3 — Después de fluidos corporales'},
+  {key:'m4', lbl:'M4 — Después de tocar al paciente'},
+  {key:'m5', lbl:'M5 — Después del entorno del paciente'},
+];
+const MANOS_AREAS = ['Hospitalización','UCI','UCIM','Urgencias','Quirófano'];
+const MANOS_PERSONAL = ['Médico','Enfermería','Pasante Enfermería','Pasante Médico','Auxiliar/Camillero','Limpieza','Otro'];
+
+function renderManos(){
+  const mes = parseInt(document.getElementById('manos-mes').value);
+  const data = DB.manos.filter(r=>r.mes===mes);
+  const total = data.length;
+  const correctos = data.filter(r=>r.correcto).length;
+  const pct = pctCalc(correctos, total);
+  const meta = 80;
+
+  // Stats
+  document.getElementById('manos-stats').innerHTML =
+    statCard('Observaciones',total,'del mes','var(--az2)') +
+    statCard('Higienizaciones correctas',correctos,pct!==null?`${pct}% de cumplimiento`:'—','var(--verde2)') +
+    statCard('Oportunidades perdidas',total-correctos,''+(total-correctos>0?'⚠ Reforzar capacitación':'✓ Sin oportunidades perdidas'),total-correctos>0?'var(--rojo2)':'var(--verde2)') +
+    statCard('Meta OMS',`≥${meta}%`,pct!==null?(pct>=meta?'✓ Meta alcanzada':'✗ Por debajo de meta'):'Sin datos',pct!==null?(pct>=meta?'var(--verde2)':'var(--rojo2)'):'var(--gris4)');
+
+  // Momentos
+  const momEl = document.getElementById('manos-momentos');
+  momEl.innerHTML = MANOS_MOMENTOS.map(m=>{
+    const usados = data.filter(r=>r[m.key]).length;
+    return progRow(m.lbl, usados, total, null);
+  }).join('');
+
+  // Por área
+  const areaEl = document.getElementById('manos-area');
+  areaEl.innerHTML = MANOS_AREAS.map(a=>{
+    const aData = data.filter(r=>r.area===a);
+    const aC = aData.filter(r=>r.correcto).length;
+    return progRow(a, aC, aData.length, meta);
+  }).join('');
+
+  // Tabla
+  const tbody = document.getElementById('manos-tbody');
+  const empty = document.getElementById('manos-empty');
+  document.getElementById('manos-count').textContent = total+' observación'+(total!==1?'es':'');
+  if(!total){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = data.map((r,i)=>`<tr>
+    <td style="color:var(--gris4)">${i+1}</td>
+    <td style="font-size:11px">${fmtF(r.fecha)}</td>
+    <td style="font-size:11px">${r.area||'—'}</td>
+    <td style="font-size:11px">${r.personal||'—'}</td>
+    <td style="font-size:11px"><span style="font-family:'DM Mono',monospace">${r.tecnica||'—'}</span></td>
+    <td style="text-align:center">${checkCell(r.m1)}</td>
+    <td style="text-align:center">${checkCell(r.m2)}</td>
+    <td style="text-align:center">${checkCell(r.m3)}</td>
+    <td style="text-align:center">${checkCell(r.m4)}</td>
+    <td style="text-align:center">${checkCell(r.m5)}</td>
+    <td style="text-align:center">${r.correcto?'<span class="badge b-verde">✓ Sí</span>':'<span class="badge b-rojo">✗ No</span>'}</td>
+    <td style="font-size:11px;color:var(--gris4);max-width:130px">${r.notas||'—'}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="requirePin(()=>abrirModalManos(${r.id}))">✏</button></td>
+  </tr>`).join('');
+}
+
+function abrirModalManos(id=null){
+  const rec = id ? DB.manos.find(r=>r.id===id)||{} : {};
+  const mes = parseInt(document.getElementById('manos-mes').value);
+  const chk = (key)=>rec[key]?'checked':'';
+  document.getElementById('modalManosContent').innerHTML = `
+    <div class="modal-title">${id?'Editar':'Nueva'} observación — Higiene de Manos
+      <button class="modal-close" onclick="closeModal('modalManos')">×</button>
+    </div>
+    <div style="font-size:12px;color:var(--gris4);margin-bottom:14px">Mes: <b>${MESES[mes]}</b></div>
+    <div class="form-grid fg-3">
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" id="hm-fecha" value="${rec.fecha||new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <label>Área / Servicio</label>
+        <select id="hm-area">
+          <option value="">—</option>
+          ${MANOS_AREAS.map(a=>`<option${rec.area===a?' selected':''}>${a}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de personal</label>
+        <select id="hm-personal">
+          <option value="">—</option>
+          ${MANOS_PERSONAL.map(p=>`<option${rec.personal===p?' selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Técnica usada</label>
+        <select id="hm-tecnica">
+          <option value="">—</option>
+          <option value="Agua y jabón"${rec.tecnica==='Agua y jabón'?' selected':''}>A — Agua y jabón</option>
+          <option value="Gel alcohólico"${rec.tecnica==='Gel alcohólico'?' selected':''}>G — Gel alcohólico</option>
+        </select>
+      </div>
+    </div>
+    <div class="section-lbl" style="display:block;margin-top:14px">5 Momentos OMS (marcar los que aplican a esta observación)</div>
+    <div class="check-grupo">
+      ${MANOS_MOMENTOS.map(m=>`
+        <label class="check-item${rec[m.key]?' checked':''}" id="ci-${m.key}">
+          <input type="checkbox" id="hm-${m.key}" ${chk(m.key)} onchange="toggleCheckItem('ci-${m.key}','hm-${m.key}')">
+          <span class="check-code">${m.key.toUpperCase()}</span>
+          <span class="check-txt">${m.lbl}</span>
+        </label>`).join('')}
+    </div>
+    <div class="section-lbl" style="display:block;margin-top:10px">Resultado de la observación</div>
+    <div class="form-grid fg-2" style="margin-bottom:10px">
+      <div class="form-group">
+        <label>¿Realizó higiene correctamente?</label>
+        <select id="hm-correcto">
+          <option value="">—</option>
+          <option value="1"${rec.correcto?(' selected'):''}> Sí — Correcto</option>
+          <option value="0"${rec.correcto===false?(' selected'):''}>✗ No — Incorrecto</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Observaciones / Notas</label>
+        <input id="hm-notas" value="${rec.notas||''}" placeholder="Notas del evaluador…">
+      </div>
+    </div>
+    <div class="form-actions">
+      ${id?`<button class="btn btn-danger btn-sm" onclick="eliminar(${id},'manos','modalManos')">🗑 Eliminar</button>`:''}
+      <button class="btn btn-ghost" onclick="closeModal('modalManos')">Cancelar</button>
+      <button class="btn btn-success" onclick="guardarManos(${id||0})">✓ Guardar</button>
+    </div>`;
+  document.getElementById('modalManos').classList.add('open');
+}
+
+function toggleCheckItem(wrapId, inputId){
+  const el = document.getElementById(wrapId);
+  const chk = document.getElementById(inputId);
+  el.className = 'check-item' + (chk.checked?' checked':'');
+}
+
+async function guardarManos(id){
+  const correcto = document.getElementById('hm-correcto').value;
+  const d = {
+    id:id||nid++, mes:parseInt(document.getElementById('manos-mes').value),
+    fecha:document.getElementById('hm-fecha').value,
+    area:document.getElementById('hm-area').value,
+    personal:document.getElementById('hm-personal').value,
+    tecnica:document.getElementById('hm-tecnica').value,
+    m1:document.getElementById('hm-m1').checked,
+    m2:document.getElementById('hm-m2').checked,
+    m3:document.getElementById('hm-m3').checked,
+    m4:document.getElementById('hm-m4').checked,
+    m5:document.getElementById('hm-m5').checked,
+    correcto: correcto===''?null:correcto==='1',
+    notas:document.getElementById('hm-notas').value.trim(),
+  };
+  if(id){ const i=DB.manos.findIndex(r=>r.id===id); if(i>-1) DB.manos[i]=d; } else DB.manos.push(d);
+  showLoader('💾 Guardando…');
+  await apiCall({action:id?'update':'save', section:'manos', record:d});
+  hideLoader();
+  closeModal('modalManos'); renderManos(); toast('✓ Observación guardada');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// BUNDLES: CVC / FOLEY / NAV — configuración
+// ══════════════════════════════════════════════════════════════════════
+const BUNDLE_CFG = {
+  cvc:{
+    label:'CVC — Catéter Venoso Central', icon:'💉', meta:90,
+    servicios:['UCI','UCIM','Hospitalización','Urgencias','Quirófano'],
+    turnos:['Matutino','Vespertino','Nocturno'],
+    deviceField:'CVC', deviceFecha:'Fecha colocación CVC',
+    diasLabel:'Días CVC',
+    insercion:[
+      {key:'i1',lbl:'I1 — Higiene de manos previo a inserción',desc:'Lavado o gel alcohólico ANTES de la inserción.'},
+      {key:'i2',lbl:'I2 — Barrera máxima estéril',desc:'Gorro, cubrebocas, bata estéril, guantes estériles y campo estéril amplio.'},
+      {key:'i3',lbl:'I3 — Antisepsia piel con clorhexidina',desc:'Clorhexidina alcohólica ≥0.5% con fricción. Dejar secar antes de puncionar.'},
+      {key:'i4',lbl:'I4 — Sitio de inserción óptimo',desc:'Preferir subclavia o yugular interna. Documentar si se usa femoral.'},
+      {key:'i5',lbl:'I5 — Retiro en campo estéril',desc:'Desechar materiales en campo estéril. Verificar integridad del catéter.'},
+    ],
+    mantenimiento:[
+      {key:'m1',lbl:'M1 — Higiene de manos en manipulación',desc:'Lavado o gel ANTES y DESPUÉS de manipular catéter, llaves o conexiones.'},
+      {key:'m2',lbl:'M2 — Curación con clorhexidina',desc:'Cambio de apósito c/7 días o antes si está sucio. Usar clorhexidina en sitio.'},
+      {key:'m3',lbl:'M3 — Apósito íntegro y limpio',desc:'Verificar cada turno: limpio, seco, íntegro y bien adherido.'},
+      {key:'m4',lbl:'M4 — Sistema cerrado y conectores',desc:'Desinfectar conectores antes de cada acceso. Mantener sistema cerrado.'},
+      {key:'m5',lbl:'M5 — Evaluar retiro oportuno',desc:'Valorar cada turno si CVC es necesario. Documentar días de permanencia.'},
+    ],
+  },
+  foley:{
+    label:'Foley — Sonda Urinaria', icon:'🩺', meta:90,
+    servicios:['UCI','UCIM','Hospitalización','Urgencias'],
+    turnos:['Matutino','Vespertino','Nocturno'],
+    deviceField:'Sonda Foley', deviceFecha:'Fecha inserción sonda',
+    diasLabel:'Días sonda',
+    insercion:[
+      {key:'i1',lbl:'I1 — Higiene de manos previo a inserción',desc:'Lavado o gel alcohólico ANTES de insertar la sonda y durante cualquier manipulación.'},
+      {key:'i2',lbl:'I2 — Técnica aséptica con campo estéril',desc:'Guantes estériles, campo estéril y técnica aséptica durante la inserción.'},
+      {key:'i3',lbl:'I3 — Sonda de calibre correcto',desc:'Seleccionar el calibre mínimo necesario para garantizar drenaje adecuado.'},
+      {key:'i4',lbl:'I4 — Fijación correcta al insertar',desc:'Fijar la sonda al muslo o abdomen según el sexo del paciente, evitando tracción.'},
+    ],
+    mantenimiento:[
+      {key:'m1',lbl:'M1 — Higiene de manos en manipulación',desc:'Higiene de manos ANTES y DESPUÉS de manipular la sonda o bolsa colectora.'},
+      {key:'m2',lbl:'M2 — Sistema cerrado e íntegro',desc:'Mantener el sistema de drenaje cerrado. Verificar integridad en cada turno.'},
+      {key:'m3',lbl:'M3 — Bolsa colectora por debajo de la vejiga',desc:'Mantener la bolsa siempre por debajo del nivel de la vejiga y sin tocar el suelo.'},
+      {key:'m4',lbl:'M4 — Higiene perineal con agua y jabón',desc:'Higiene del meato urinario con agua y jabón en cada turno.'},
+      {key:'m5',lbl:'M5 — Evaluar retiro oportuno',desc:'Valorar en cada turno si la sonda sigue siendo necesaria. Documentar días.'},
+    ],
+  },
+  nav:{
+    label:'NAV — Neumonía Asociada al Ventilador', icon:'💨', meta:90,
+    servicios:['UCI','UCIM'],
+    turnos:['Matutino','Vespertino','Nocturno'],
+    deviceField:'Ventilador Mecánico', deviceFecha:'Fecha inicio VM',
+    diasLabel:'Días VM',
+    insercion:[
+      {key:'i1',lbl:'I1 — Cabecera 30–45° al conectar VM',desc:'Elevar la cabecera entre 30 y 45° al momento de conectar al ventilador.'},
+      {key:'i2',lbl:'I2 — Higiene de manos antes de conectar',desc:'Lavado o gel alcohólico ANTES de manipular circuito o tubo ET.'},
+      {key:'i3',lbl:'I3 — Verificar equipo y circuito estéril',desc:'Confirmar circuito nuevo o esterilizado. Verificar humidificador y filtros.'},
+    ],
+    mantenimiento:[
+      {key:'m1',lbl:'M1 — Cabecera 30–45° en cada turno',desc:'Verificar y documentar cada turno que la cabecera se mantiene entre 30 y 45°.'},
+      {key:'m2',lbl:'M2 — Higiene oral con clorhexidina 0.12%',desc:'Higiene bucal con clorhexidina 0.12% cada 6–8 horas.'},
+      {key:'m3',lbl:'M3 — Presión del cuff 20–30 cmH₂O',desc:'Verificar presión del globo con manómetro en cada turno. Mantener 20–30 cmH₂O.'},
+      {key:'m4',lbl:'M4 — Higiene de manos en manipulación',desc:'Higiene de manos ANTES y DESPUÉS de manipular tubo ET, circuito o succión.'},
+      {key:'m5',lbl:'M5 — Circuito del VM sin condensados',desc:'Drenar condensados del circuito en cada turno. No sacudir el circuito.'},
+      {key:'m6',lbl:'M6 — Sedación diaria mínima necesaria',desc:'Menor nivel de sedación clínicamente necesario. Valorar despertar diario (SAT).'},
+      {key:'m7',lbl:'M7 — Evaluar retiro del ventilador',desc:'Valorar destete o extubación en cada turno. Retirar VM tan pronto como sea posible.'},
+    ],
+  },
+};
+
+// ── Render genérico para CVC/Foley/NAV ────────────────────────────────
+function renderBundle(tipo){
+  const cfg = BUNDLE_CFG[tipo];
+  const mesEl = document.getElementById(tipo+'-mes');
+  const mes = parseInt(mesEl.value);
+  const data = DB[tipo].filter(r=>r.mes===mes);
+  const todosItems = [...cfg.insercion,...cfg.mantenimiento];
+  const todosCampos = todosItems.map(x=>x.key);
+
+  let si=0, total=0;
+  data.forEach(r=>{ todosCampos.forEach(c=>{ if(r[c]!==undefined){ total++; if(r[c]) si++; } }); });
+  const pct = pctCalc(si, total);
+  const diasVM = data.length>0 ? Math.round(data.reduce((s,r)=>{ const d=parseInt(r.diasDevice)||0; return s+d; },0)/data.length) : null;
+
+  // Stats
+  document.getElementById(tipo+'-stats').innerHTML =
+    statCard('Evaluaciones',data.length,'registros del mes','var(--az2)') +
+    statCard('Medidas cumplidas',si,`de ${total} posibles`,'var(--verde2)') +
+    statCard('Medidas incumplidas',total-si,''+(total-si>0?'⚠ Revisar':'✓'),'var(--rojo2)') +
+    statCard('Adherencia global',pct!==null?pct+'%':'—',pct!==null?(pct>=cfg.meta?'✓ Meta alcanzada':'✗ Por debajo de meta'):'Sin datos',pct!==null?semColor(pct,cfg.meta):'var(--gris4)');
+
+  // Inserción
+  document.getElementById(tipo+'-insercion').innerHTML = cfg.insercion.map(m=>{
+    const mSi = data.filter(r=>r[m.key]).length;
+    return progRow(m.lbl, mSi, data.length, cfg.meta);
+  }).join('');
+
+  // Mantenimiento
+  document.getElementById(tipo+'-manten').innerHTML = cfg.mantenimiento.map(m=>{
+    const mSi = data.filter(r=>r[m.key]).length;
+    return progRow(m.lbl, mSi, data.length, cfg.meta);
+  }).join('');
+
+  // Tabla
+  const tbody = document.getElementById(tipo+'-tbody');
+  const empty = document.getElementById(tipo+'-empty');
+  document.getElementById(tipo+'-count').textContent = data.length+' registro'+(data.length!==1?'s':'');
+
+  if(!data.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  const insertCols = cfg.insercion.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`);
+
+  tbody.innerHTML = data.map((r,i)=>{
+    const iCells = cfg.insercion.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`).join('');
+    const mCells = cfg.mantenimiento.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`).join('');
+    const adh = pctCalc(todosCampos.filter(c=>r[c]).length, todosCampos.length);
+    return `<tr>
+      <td style="color:var(--gris4)">${i+1}</td>
+      <td style="font-size:11px">${fmtF(r.fecha)}</td>
+      <td style="font-size:11px">${fmtF(r.fechaDevice)}</td>
+      <td><b>${r.hab||'—'}</b></td>
+      <td style="font-size:11px;max-width:120px">${r.paciente||'—'}</td>
+      <td style="font-size:11px">${r.servicio||'—'}</td>
+      <td style="font-size:11px">${r.turno||'—'}</td>
+      <td style="font-size:11px">${r.personal||'—'}</td>
+      <td style="text-align:center;font-weight:600;color:var(--az2)">${r.diasDevice||'—'}</td>
+      ${iCells}${mCells}
+      <td>${adh!==null?semBadge(adh,cfg.meta):'—'}</td>
+      <td style="font-size:11px;color:var(--gris4);max-width:100px">${r.notas||'—'}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="requirePin(()=>abrirModalBundle('${tipo}',${r.id}))">✏</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCVC(){ renderBundle('cvc'); }
+function renderFoley(){ renderBundle('foley'); }
+function renderNAV(){ renderBundle('nav'); }
+
+// ── Modal Bundle ──────────────────────────────────────────────────────
+function abrirModalBundle(tipo, id=null){
+  const cfg = BUNDLE_CFG[tipo];
+  const rec = id ? DB[tipo].find(r=>r.id===id)||{} : {};
+  const mesEl = document.getElementById(tipo+'-mes');
+  const mes = parseInt(mesEl.value);
+  const chk = (key)=>rec[key]?'checked':'';
+
+  const todasMedidas = [...cfg.insercion,...cfg.mantenimiento];
+
+  document.getElementById('modalBundleContent').innerHTML = `
+    <div class="modal-title">${id?'Editar':'Nueva'} evaluación — ${cfg.icon} ${cfg.label}
+      <button class="modal-close" onclick="closeModal('modalBundle')">×</button>
+    </div>
+    <div style="font-size:12px;color:var(--gris4);margin-bottom:14px">Mes: <b>${MESES[mes]}</b></div>
+
+    <div class="form-grid fg-3">
+      <div class="form-group">
+        <label>Fecha de evaluación</label>
+        <input type="date" id="bd-fecha" value="${rec.fecha||new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <label>${cfg.deviceFecha}</label>
+        <input type="date" id="bd-fechaDev" value="${rec.fechaDevice||''}">
+      </div>
+      <div class="form-group">
+        <label>Habitación / Sala</label>
+        <input id="bd-hab" value="${rec.hab||''}" placeholder="Ej. UCI 1, 12…">
+      </div>
+      <div class="form-group full">
+        <label>Nombre del paciente</label>
+        <input id="bd-paciente" value="${rec.paciente||''}" placeholder="Apellidos, Nombre">
+      </div>
+      <div class="form-group">
+        <label>Servicio</label>
+        <select id="bd-servicio">
+          <option value="">—</option>
+          ${cfg.servicios.map(s=>`<option${rec.servicio===s?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Turno</label>
+        <select id="bd-turno">
+          <option value="">—</option>
+          ${cfg.turnos.map(t=>`<option${rec.turno===t?' selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Personal evaluado</label>
+        <input id="bd-personal" value="${rec.personal||''}" placeholder="Nombre del evaluado">
+      </div>
+      <div class="form-group">
+        <label>${cfg.diasLabel}</label>
+        <input type="number" id="bd-dias" value="${rec.diasDevice||''}" min="0" placeholder="Días desde colocación">
+      </div>
+    </div>
+
+    <div class="section-lbl" style="display:block;margin-top:14px">🔵 Medidas de Inserción / Inicio</div>
+    <div class="check-grupo">
+      ${cfg.insercion.map(m=>`
+        <label class="check-item${rec[m.key]?' checked':''}" id="ci-${m.key}">
+          <input type="checkbox" id="bd-${m.key}" ${chk(m.key)} onchange="toggleCheckItem('ci-${m.key}','bd-${m.key}')">
+          <span class="check-code">${m.key.toUpperCase()}</span>
+          <span class="check-txt"><strong>${m.lbl}</strong>${m.desc}</span>
+        </label>`).join('')}
+    </div>
+
+    <div class="section-lbl" style="display:block;margin-top:12px">🟢 Medidas de Mantenimiento (turno actual)</div>
+    <div class="check-grupo">
+      ${cfg.mantenimiento.map(m=>`
+        <label class="check-item${rec[m.key]?' checked':''}" id="ci-${m.key}">
+          <input type="checkbox" id="bd-${m.key}" ${chk(m.key)} onchange="toggleCheckItem('ci-${m.key}','bd-${m.key}')">
+          <span class="check-code">${m.key.toUpperCase()}</span>
+          <span class="check-txt"><strong>${m.lbl}</strong>${m.desc}</span>
+        </label>`).join('')}
+    </div>
+
+    <div class="form-grid fg-2" style="margin-top:10px">
+      <div class="form-group full">
+        <label>Observaciones</label>
+        <input id="bd-notas" value="${rec.notas||''}" placeholder="Notas del evaluador…">
+      </div>
+    </div>
+    <div class="form-actions">
+      ${id?`<button class="btn btn-danger btn-sm" onclick="eliminar(${id},'${tipo}','modalBundle')">🗑 Eliminar</button>`:''}
+      <button class="btn btn-ghost" onclick="closeModal('modalBundle')">Cancelar</button>
+      <button class="btn btn-success" onclick="guardarBundle('${tipo}',${id||0})">✓ Guardar</button>
+    </div>`;
+  document.getElementById('modalBundle').classList.add('open');
+}
+
+async function guardarBundle(tipo, id){
+  const cfg = BUNDLE_CFG[tipo];
+  const mes = parseInt(document.getElementById(tipo+'-mes').value);
+  const todasMedidas = [...cfg.insercion,...cfg.mantenimiento];
+  const d = {
+    id:id||nid++, mes,
+    fecha:document.getElementById('bd-fecha').value,
+    fechaDevice:document.getElementById('bd-fechaDev').value,
+    hab:document.getElementById('bd-hab').value.trim(),
+    paciente:document.getElementById('bd-paciente').value.trim(),
+    servicio:document.getElementById('bd-servicio').value,
+    turno:document.getElementById('bd-turno').value,
+    personal:document.getElementById('bd-personal').value.trim(),
+    diasDevice:document.getElementById('bd-dias').value,
+    notas:document.getElementById('bd-notas').value.trim(),
+  };
+  todasMedidas.forEach(m=>{ d[m.key]=document.getElementById('bd-'+m.key).checked; });
+
+  if(id){ const i=DB[tipo].findIndex(r=>r.id===id); if(i>-1) DB[tipo][i]=d; } else DB[tipo].push(d);
+  showLoader('💾 Guardando…');
+  await apiCall({action:id?'update':'save', section:tipo, record:d});
+  hideLoader();
+  closeModal('modalBundle');
+  if(tipo==='cvc') renderCVC();
+  if(tipo==='foley') renderFoley();
+  if(tipo==='nav') renderNAV();
+  toast('✓ Evaluación guardada');
+}
+
+// ── Eliminar ──────────────────────────────────────────────────────────
+async function eliminar(id, sec, modal){
+  if(!confirm('¿Eliminar este registro?')) return;
+  DB[sec]=DB[sec].filter(r=>r.id!==id);
+  showLoader('🗑 Eliminando…');
+  await apiCall({action:'delete', section:sec, id});
+  hideLoader();
+  closeModal(modal);
+  if(sec==='manos') renderManos();
+  if(sec==='cvc') renderCVC();
+  if(sec==='foley') renderFoley();
+  if(sec==='nav') renderNAV();
+  toast('Registro eliminado','error');
+}
+
+// ── CSV Export ────────────────────────────────────────────────────────
+function exportCSV(sec){
+  const data = DB[sec];
+  if(!data.length){ toast('Sin datos para exportar','error'); return; }
+  const keys = Object.keys(data[0]);
+  const csv=[keys.join(',')].concat(data.map(r=>keys.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(','))).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=`paquete_${sec}_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click(); toast('CSV exportado');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════
+cargarDatos();
+</script>
+</body>
+</html>
