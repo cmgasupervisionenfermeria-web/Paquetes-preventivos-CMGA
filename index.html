@@ -93,10 +93,18 @@ input:focus,select:focus{border-color:var(--az2);box-shadow:0 0 0 3px rgba(27,79
 .check-item:hover{background:var(--gris0)}
 .check-item.checked{background:var(--verde3);border-color:#86EFAC}
 .check-item.unchecked{background:var(--rojo3);border-color:#FECACA}
+.check-item.na{background:var(--gris1);border-color:var(--gris3)}
 .check-item input[type=checkbox]{width:18px;height:18px;margin-top:1px;flex-shrink:0;cursor:pointer;accent-color:var(--verde2)}
 .check-code{font-size:11px;font-weight:700;color:var(--az2);flex-shrink:0;min-width:28px;margin-top:1px}
 .check-txt{font-size:12px;color:var(--gris6);line-height:1.4}
 .check-txt strong{color:var(--gris7);display:block;margin-bottom:2px}
+.tri-toggle{display:flex;gap:6px;margin-top:8px}
+.tri-btn{flex:1;padding:6px 8px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid var(--gris3);background:#fff;cursor:pointer;font-family:inherit;color:var(--gris5);transition:all .12s;white-space:nowrap}
+.tri-btn:hover{background:var(--gris1)}
+.tri-btn.active-si{background:var(--verde2);border-color:var(--verde2);color:#fff}
+.tri-btn.active-no{background:var(--rojo2);border-color:var(--rojo2);color:#fff}
+.tri-btn.active-na{background:var(--gris5);border-color:var(--gris5);color:#fff}
+.section-lbl-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 
 /* ── TABLA ── */
 .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--gris2)}
@@ -543,7 +551,11 @@ function fmtF(f){ if(!f) return '—'; try{ return new Date(f+'T12:00').toLocale
 function calcDias(desde){ if(!desde) return '—'; const d=Math.max(0,Math.round((new Date()-new Date(desde+'T12:00'))/86400000)); return d+' d'; }
 
 // ── CHECK CELL ─────────────────────────────────────────────────────────
-function checkCell(v){ return v?'<span style="color:var(--verde2);font-weight:700;font-size:13px">✓</span>':'<span style="color:var(--rojo2);font-weight:700;font-size:13px">✗</span>'; }
+function checkCell(v){
+  if(v===true) return '<span style="color:var(--verde2);font-weight:700;font-size:13px">✓</span>';
+  if(v===false) return '<span style="color:var(--rojo2);font-weight:700;font-size:13px">✗</span>';
+  return '<span style="color:var(--gris4);font-size:10px;font-weight:700">N/A</span>';
+}
 
 // ── PROGRESS BAR HELPER ────────────────────────────────────────────────
 function progRow(label, si, total, meta=null){
@@ -606,7 +618,7 @@ function calcAdherencia(arr, mes, campos){
   const data = mes>=0 ? arr.filter(r=>r.mes===mes) : arr;
   if(!data.length) return null;
   let si=0, total=0;
-  data.forEach(r=>{ campos.forEach(c=>{ if(r[c]!==undefined){ total++; if(r[c]) si++; } }); });
+  data.forEach(r=>{ campos.forEach(c=>{ if(r[c]!==undefined && r[c]!==null){ total++; if(r[c]) si++; } }); });
   return pctCalc(si, total);
 }
 
@@ -909,27 +921,29 @@ function renderBundle(tipo){
   const todosCampos = todosItems.map(x=>x.key);
 
   let si=0, total=0;
-  data.forEach(r=>{ todosCampos.forEach(c=>{ if(r[c]!==undefined){ total++; if(r[c]) si++; } }); });
+  data.forEach(r=>{ todosCampos.forEach(c=>{ if(r[c]!==undefined && r[c]!==null){ total++; if(r[c]) si++; } }); });
   const pct = pctCalc(si, total);
   const diasVM = data.length>0 ? Math.round(data.reduce((s,r)=>{ const d=parseInt(r.diasDevice)||0; return s+d; },0)/data.length) : null;
 
   // Stats
   document.getElementById(tipo+'-stats').innerHTML =
     statCard('Evaluaciones',data.length,'registros del mes','var(--az2)') +
-    statCard('Medidas cumplidas',si,`de ${total} posibles`,'var(--verde2)') +
+    statCard('Medidas cumplidas',si,`de ${total} valorables`,'var(--verde2)') +
     statCard('Medidas incumplidas',total-si,''+(total-si>0?'⚠ Revisar':'✓'),'var(--rojo2)') +
     statCard('Adherencia global',pct!==null?pct+'%':'—',pct!==null?(pct>=cfg.meta?'✓ Meta alcanzada':'✗ Por debajo de meta'):'Sin datos',pct!==null?semColor(pct,cfg.meta):'var(--gris4)');
 
-  // Inserción
+  // Inserción (excluye registros marcados como No aplica)
   document.getElementById(tipo+'-insercion').innerHTML = cfg.insercion.map(m=>{
-    const mSi = data.filter(r=>r[m.key]).length;
-    return progRow(m.lbl, mSi, data.length, cfg.meta);
+    const aplicables = data.filter(r=>r[m.key]!==undefined && r[m.key]!==null);
+    const mSi = aplicables.filter(r=>r[m.key]).length;
+    return progRow(m.lbl, mSi, aplicables.length, cfg.meta);
   }).join('');
 
-  // Mantenimiento
+  // Mantenimiento (excluye registros marcados como No aplica)
   document.getElementById(tipo+'-manten').innerHTML = cfg.mantenimiento.map(m=>{
-    const mSi = data.filter(r=>r[m.key]).length;
-    return progRow(m.lbl, mSi, data.length, cfg.meta);
+    const aplicables = data.filter(r=>r[m.key]!==undefined && r[m.key]!==null);
+    const mSi = aplicables.filter(r=>r[m.key]).length;
+    return progRow(m.lbl, mSi, aplicables.length, cfg.meta);
   }).join('');
 
   // Tabla
@@ -943,7 +957,8 @@ function renderBundle(tipo){
   tbody.innerHTML = data.map((r,i)=>{
     const iCells = cfg.insercion.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`).join('');
     const mCells = cfg.mantenimiento.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`).join('');
-    const adh = pctCalc(todosCampos.filter(c=>r[c]).length, todosCampos.length);
+    const camposAplicables = todosCampos.filter(c=>r[c]!==undefined && r[c]!==null);
+    const adh = camposAplicables.length ? pctCalc(camposAplicables.filter(c=>r[c]).length, camposAplicables.length) : null;
     return `<tr>
       <td style="color:var(--gris4)">${i+1}</td>
       <td style="font-size:11px">${fmtF(r.fecha)}</td>
@@ -955,7 +970,7 @@ function renderBundle(tipo){
       <td style="font-size:11px">${r.personal||'—'}</td>
       <td style="text-align:center;font-weight:600;color:var(--az2)">${r.diasDevice||'—'}</td>
       ${iCells}${mCells}
-      <td>${adh!==null?semBadge(adh,cfg.meta):'—'}</td>
+      <td>${adh!==null?semBadge(adh,cfg.meta):'<span class="badge" style="background:var(--gris1);color:var(--gris5)">N/A</span>'}</td>
       <td style="font-size:11px;color:var(--gris4);max-width:100px">${r.notas||'—'}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="requirePin(()=>abrirModalBundle('${tipo}',${r.id}))">✏</button></td>
     </tr>`;
@@ -967,12 +982,49 @@ function renderFoley(){ renderBundle('foley'); }
 function renderNAV(){ renderBundle('nav'); }
 
 // ── Modal Bundle ──────────────────────────────────────────────────────
+function medidaItemHTML(m, val){
+  const claseEstado = val==='si'?'checked':val==='no'?'unchecked':'na';
+  return `<label class="check-item ${claseEstado}" id="ci-${m.key}">
+    <input type="hidden" id="bd-${m.key}" value="${val}">
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <span class="check-code">${m.key.toUpperCase()}</span>
+        <span class="check-txt"><strong>${m.lbl}</strong>${m.desc||''}</span>
+      </div>
+      <div class="tri-toggle">
+        <button type="button" data-val="si" class="tri-btn${val==='si'?' active-si':''}" onclick="setMedida('${m.key}','si')">✓ Cumple</button>
+        <button type="button" data-val="no" class="tri-btn${val==='no'?' active-no':''}" onclick="setMedida('${m.key}','no')">✗ No cumple</button>
+        <button type="button" data-val="na" class="tri-btn${val==='na'?' active-na':''}" onclick="setMedida('${m.key}','na')">— No aplica</button>
+      </div>
+    </div>
+  </label>`;
+}
+
+function setMedida(key, val){
+  const hidden = document.getElementById('bd-'+key);
+  if(!hidden) return;
+  hidden.value = val;
+  const wrap = document.getElementById('ci-'+key);
+  wrap.classList.remove('checked','unchecked','na');
+  wrap.classList.add(val==='si'?'checked':val==='no'?'unchecked':'na');
+  wrap.querySelectorAll('.tri-btn').forEach(b=>{
+    b.classList.remove('active-si','active-no','active-na');
+    if(b.dataset.val===val) b.classList.add('active-'+val);
+  });
+}
+
+function marcarSeccionNA(tipo, seccion){
+  const cfg = BUNDLE_CFG[tipo];
+  const items = seccion==='insercion' ? cfg.insercion : cfg.mantenimiento;
+  items.forEach(m=>setMedida(m.key,'na'));
+}
+
 function abrirModalBundle(tipo, id=null){
   const cfg = BUNDLE_CFG[tipo];
   const rec = id ? DB[tipo].find(r=>r.id===id)||{} : {};
   const mesEl = document.getElementById(tipo+'-mes');
   const mes = parseInt(mesEl.value);
-  const chk = (key)=>rec[key]?'checked':'';
+  const valOf = (key)=> rec[key]===true?'si': rec[key]===false?'no': rec[key]===null?'na':'no';
 
   const todasMedidas = [...cfg.insercion,...cfg.mantenimiento];
 
@@ -1026,24 +1078,22 @@ function abrirModalBundle(tipo, id=null){
       </div>
     </div>
 
-    <div class="section-lbl" style="display:block;margin-top:14px">🔵 Medidas de Inserción / Inicio</div>
+    <div class="section-lbl section-lbl-row" style="display:flex;margin-top:14px">
+      <span>🔵 Medidas de Inserción / Inicio</span>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="marcarSeccionNA('${tipo}','insercion')">Ya instalado antes — marcar todo N/A</button>
+    </div>
+    <div style="font-size:11px;color:var(--gris4);margin:-6px 0 8px">Si el dispositivo ya estaba colocado desde antes de este turno, estas medidas no son valorables — márcalas como "No aplica" en vez de dejarlas sin marcar.</div>
     <div class="check-grupo">
-      ${cfg.insercion.map(m=>`
-        <label class="check-item${rec[m.key]?' checked':''}" id="ci-${m.key}">
-          <input type="checkbox" id="bd-${m.key}" ${chk(m.key)} onchange="toggleCheckItem('ci-${m.key}','bd-${m.key}')">
-          <span class="check-code">${m.key.toUpperCase()}</span>
-          <span class="check-txt"><strong>${m.lbl}</strong>${m.desc}</span>
-        </label>`).join('')}
+      ${cfg.insercion.map(m=>medidaItemHTML(m,valOf(m.key))).join('')}
     </div>
 
-    <div class="section-lbl" style="display:block;margin-top:12px">🟢 Medidas de Mantenimiento (turno actual)</div>
+    <div class="section-lbl section-lbl-row" style="display:flex;margin-top:12px">
+      <span>🟢 Medidas de Mantenimiento (turno actual)</span>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="marcarSeccionNA('${tipo}','mantenimiento')">Recién instalado — marcar todo N/A</button>
+    </div>
+    <div style="font-size:11px;color:var(--gris4);margin:-6px 0 8px">Si el dispositivo se acaba de colocar y aún no hay un turno completo para valorarlas, márcalas como "No aplica".</div>
     <div class="check-grupo">
-      ${cfg.mantenimiento.map(m=>`
-        <label class="check-item${rec[m.key]?' checked':''}" id="ci-${m.key}">
-          <input type="checkbox" id="bd-${m.key}" ${chk(m.key)} onchange="toggleCheckItem('ci-${m.key}','bd-${m.key}')">
-          <span class="check-code">${m.key.toUpperCase()}</span>
-          <span class="check-txt"><strong>${m.lbl}</strong>${m.desc}</span>
-        </label>`).join('')}
+      ${cfg.mantenimiento.map(m=>medidaItemHTML(m,valOf(m.key))).join('')}
     </div>
 
     <div class="form-grid fg-2" style="margin-top:10px">
@@ -1076,7 +1126,10 @@ async function guardarBundle(tipo, id){
     diasDevice:document.getElementById('bd-dias').value,
     notas:document.getElementById('bd-notas').value.trim(),
   };
-  todasMedidas.forEach(m=>{ d[m.key]=document.getElementById('bd-'+m.key).checked; });
+  todasMedidas.forEach(m=>{
+    const v = document.getElementById('bd-'+m.key).value;
+    d[m.key] = v==='si'?true : v==='no'?false : null;
+  });
 
   if(id){ const i=DB[tipo].findIndex(r=>r.id===id); if(i>-1) DB[tipo][i]=d; } else DB[tipo].push(d);
   showLoader('💾 Guardando…');
@@ -1123,4 +1176,3 @@ cargarDatos();
 </script>
 </body>
 </html>
-
