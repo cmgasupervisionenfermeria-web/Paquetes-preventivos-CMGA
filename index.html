@@ -940,8 +940,6 @@ function renderBundle(tipo){
   if(!data.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
 
-  const insertCols = cfg.insercion.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`);
-
   tbody.innerHTML = data.map((r,i)=>{
     const iCells = cfg.insercion.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`).join('');
     const mCells = cfg.mantenimiento.map(m=>`<td style="text-align:center">${checkCell(r[m.key])}</td>`).join('');
@@ -1125,3 +1123,4 @@ cargarDatos();
 </script>
 </body>
 </html>
+
