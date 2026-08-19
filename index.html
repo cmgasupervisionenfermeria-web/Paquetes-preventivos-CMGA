@@ -491,7 +491,6 @@ async function apiCall(payload){
     return data;
   }catch(e){
     console.error('Error GAS:', e);
-    toast('⚠ Sin conexión — guardado localmente','error');
     return { ok:false };
   }
 }
@@ -520,8 +519,10 @@ async function cargarDatos(){
         DB[s] = data[s].map(rec=>{
           const bools=['m1','m2','m3','m4','m5','m6','m7','i1','i2','i3','i4','i5','correcto'];
           bools.forEach(b=>{
-            if(rec[b]==='TRUE'||rec[b]==='true'||rec[b]===1||rec[b]==='1') rec[b]=true;
-            else if(rec[b]==='FALSE'||rec[b]==='false'||rec[b]===0||rec[b]==='0'||rec[b]==='') rec[b]=false;
+            const v = rec[b];
+            if(v==='TRUE'||v===true||v===1||v==='1') rec[b]=true;
+            else if(v==='FALSE'||v===false||v===0||v==='0') rec[b]=false;
+            else rec[b]=null; // celda vacía en Sheets = No aplica (N/A), nunca "no cumple"
           });
           if(rec.mes!==undefined) rec.mes=parseInt(rec.mes)||0;
           if(rec.id!==undefined) rec.id=parseInt(rec.id)||rec.id;
@@ -838,9 +839,11 @@ async function guardarManos(id){
   };
   if(id){ const i=DB.manos.findIndex(r=>r.id===id); if(i>-1) DB.manos[i]=d; } else DB.manos.push(d);
   showLoader('💾 Guardando…');
-  await apiCall({action:id?'update':'save', section:'manos', record:d});
+  const res = await apiCall({action:id?'update':'save', section:'manos', record:d});
   hideLoader();
-  closeModal('modalManos'); renderManos(); toast('✓ Observación guardada');
+  closeModal('modalManos'); renderManos();
+  if(res && res.ok) toast('✓ Observación guardada');
+  else toast('⚠ Guardado solo en este dispositivo — no llegó a Sheets, revisa la conexión','error');
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1133,13 +1136,14 @@ async function guardarBundle(tipo, id){
 
   if(id){ const i=DB[tipo].findIndex(r=>r.id===id); if(i>-1) DB[tipo][i]=d; } else DB[tipo].push(d);
   showLoader('💾 Guardando…');
-  await apiCall({action:id?'update':'save', section:tipo, record:d});
+  const res = await apiCall({action:id?'update':'save', section:tipo, record:d});
   hideLoader();
   closeModal('modalBundle');
   if(tipo==='cvc') renderCVC();
   if(tipo==='foley') renderFoley();
   if(tipo==='nav') renderNAV();
-  toast('✓ Evaluación guardada');
+  if(res && res.ok) toast('✓ Evaluación guardada');
+  else toast('⚠ Guardado solo en este dispositivo — no llegó a Sheets, revisa la conexión','error');
 }
 
 // ── Eliminar ──────────────────────────────────────────────────────────
@@ -1147,14 +1151,15 @@ async function eliminar(id, sec, modal){
   if(!confirm('¿Eliminar este registro?')) return;
   DB[sec]=DB[sec].filter(r=>r.id!==id);
   showLoader('🗑 Eliminando…');
-  await apiCall({action:'delete', section:sec, id});
+  const res = await apiCall({action:'delete', section:sec, id});
   hideLoader();
   closeModal(modal);
   if(sec==='manos') renderManos();
   if(sec==='cvc') renderCVC();
   if(sec==='foley') renderFoley();
   if(sec==='nav') renderNAV();
-  toast('Registro eliminado','error');
+  if(res && res.ok) toast('Registro eliminado','error');
+  else toast('⚠ Eliminado solo en este dispositivo — no llegó a Sheets, revisa la conexión','error');
 }
 
 // ── CSV Export ────────────────────────────────────────────────────────
@@ -1176,3 +1181,4 @@ cargarDatos();
 </script>
 </body>
 </html>
+
