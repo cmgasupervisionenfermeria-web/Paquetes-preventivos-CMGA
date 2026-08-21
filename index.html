@@ -1027,7 +1027,7 @@ function abrirModalBundle(tipo, id=null){
   const rec = id ? DB[tipo].find(r=>r.id===id)||{} : {};
   const mesEl = document.getElementById(tipo+'-mes');
   const mes = parseInt(mesEl.value);
-  const valOf = (key)=> rec[key]===true?'si': rec[key]===false?'no': rec[key]===null?'na':'no';
+  const valOf = (key)=> rec[key]===true?'si': rec[key]===false?'no': rec[key]===null?'na':'';
 
   const todasMedidas = [...cfg.insercion,...cfg.mantenimiento];
 
@@ -1181,4 +1181,3 @@ cargarDatos();
 </script>
 </body>
 </html>
-
