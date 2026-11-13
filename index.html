@@ -197,14 +197,11 @@ tbody tr:last-child{border-bottom:none}
   <div class="logo"><div class="logo-icon">🛡</div>Paquetes Preventivos</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('concentrado',this)">📊 Concentrado</button>
-    <button class="nav-tab" onclick="showPage('manos',this)">🖐 Higiene de Manos</button>
-    <button class="nav-tab" onclick="showPage('cvc',this)">💉 Paquete CVC</button>
-    <button class="nav-tab" onclick="showPage('foley',this)">🩺 Paquete Foley</button>
-    <button class="nav-tab" onclick="showPage('nav',this)">💨 Paquete NAV</button>
     <button class="nav-tab" onclick="showPage('ident',this)">🪪 Meta 1 · Identificación</button>
     <button class="nav-tab" onclick="showPage('comunicacion',this)">🗣 Meta 2 · Comunicación</button>
     <button class="nav-tab" onclick="showPage('medriesgo',this)">💊 Meta 3 · Alto Riesgo</button>
     <button class="nav-tab" onclick="showPage('cirugia',this)">🔪 Meta 4 · Cirugía Segura</button>
+    <button class="nav-tab" onclick="showPage('meta5',this)">🧼 Meta 5 · IAAS</button>
     <button class="nav-tab" onclick="showPage('caidas',this)">🛏 Meta 6 · Caídas</button>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;padding-left:10px;flex-shrink:0">
@@ -257,8 +254,22 @@ tbody tr:last-child{border-bottom:none}
   </div>
 </div>
 
-<!-- ══════════ HIGIENE DE MANOS ══════════ -->
-<div class="page" id="page-manos">
+<!-- ══════════ META 5 · IAAS (agrupa Higiene de Manos / CVC / Foley / NAV) ══════════ -->
+<div class="page" id="page-meta5">
+  <div class="top-bar">
+    <div>
+      <div class="page-title">🧼 Meta 5 — Reducción de IAAS</div>
+      <div class="page-sub">Infecciones Asociadas a la Atención de la Salud · Meta Internacional de Seguridad del Paciente</div>
+    </div>
+  </div>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInnerTab('manos',this)">🖐 Higiene de Manos</button>
+    <button class="inner-tab" onclick="showInnerTab('cvc',this)">💉 Paquete CVC</button>
+    <button class="inner-tab" onclick="showInnerTab('foley',this)">🩺 Paquete Foley</button>
+    <button class="inner-tab" onclick="showInnerTab('nav',this)">💨 Paquete NAV</button>
+  </div>
+
+<div class="inner-panel active" id="page-manos">
   <div class="top-bar">
     <div>
       <div class="page-title">🖐 Higiene de Manos</div>
@@ -308,8 +319,7 @@ tbody tr:last-child{border-bottom:none}
   </div>
 </div>
 
-<!-- ══════════ CVC ══════════ -->
-<div class="page" id="page-cvc">
+<div class="inner-panel" id="page-cvc">
   <div class="top-bar">
     <div>
       <div class="page-title">💉 Paquete CVC</div>
@@ -346,8 +356,7 @@ tbody tr:last-child{border-bottom:none}
   </div>
 </div>
 
-<!-- ══════════ FOLEY ══════════ -->
-<div class="page" id="page-foley">
+<div class="inner-panel" id="page-foley">
   <div class="top-bar">
     <div>
       <div class="page-title">🩺 Paquete Foley</div>
@@ -384,8 +393,7 @@ tbody tr:last-child{border-bottom:none}
   </div>
 </div>
 
-<!-- ══════════ NAV ══════════ -->
-<div class="page" id="page-nav">
+<div class="inner-panel" id="page-nav">
   <div class="top-bar">
     <div>
       <div class="page-title">💨 Paquete NAV</div>
@@ -421,6 +429,7 @@ tbody tr:last-child{border-bottom:none}
     </div>
   </div>
 </div>
+</div><!-- /page-meta5 -->
 
 <!-- ══════════ META 1 · IDENTIFICACIÓN ══════════ -->
 <div class="page" id="page-ident">
@@ -804,11 +813,33 @@ function showPage(id, btn){
   document.getElementById('page-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   if(id==='concentrado') renderConcentrado();
+  if(id==='meta5'){
+    // Meta 5 agrupa 4 sub-paquetes en pestañas internas — renderiza la que esté activa
+    const activo = document.querySelector('#page-meta5 .inner-panel.active');
+    renderSubpaqueteIAAS(activo ? activo.id.replace('page-','') : 'manos');
+  }
+  if(['ident','comunicacion','medriesgo','cirugia','caidas'].includes(id)) renderMISP(id);
+}
+
+// ── Pestañas internas de Meta 5 (Higiene de Manos / CVC / Foley / NAV) ──
+function renderSubpaqueteIAAS(id){
   if(id==='manos') renderManos();
   if(id==='cvc') renderCVC();
   if(id==='foley') renderFoley();
   if(id==='nav') renderNAV();
-  if(['ident','comunicacion','medriesgo','cirugia','caidas'].includes(id)) renderMISP(id);
+}
+function showInnerTab(id, btn){
+  document.querySelectorAll('#page-meta5 .inner-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#page-meta5 .inner-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  renderSubpaqueteIAAS(id);
+}
+function irAMeta5(subTipo){
+  const metaBtn = Array.from(document.querySelectorAll('.nav-tab')).find(b=>(b.getAttribute('onclick')||'').includes("showPage('meta5'"));
+  showPage('meta5', metaBtn);
+  const innerBtn = Array.from(document.querySelectorAll('#page-meta5 .inner-tab')).find(b=>(b.getAttribute('onclick')||'').includes(`showInnerTab('${subTipo}'`));
+  showInnerTab(subTipo, innerBtn);
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -854,6 +885,7 @@ function renderConcentrado(){
       desc:'Meta Internacional 6' },
   ];
 
+  const esIAAS = ['manos','cvc','foley','nav'];
   const grid = document.getElementById('dash-paq-grid');
   grid.innerHTML = paquetes.map(p=>{
     const data = mes>=0 ? DB[p.id].filter(r=>r.mes===mes) : DB[p.id];
@@ -861,7 +893,8 @@ function renderConcentrado(){
     const n = data.length;
     const color = pct!==null ? semColor(pct, p.meta) : 'var(--gris4)';
     const barW = pct!==null ? pct : 0;
-    return `<div class="paq-card" onclick="showPage('${p.id}',document.querySelector('[onclick*=\\'${p.id}\\']'))">
+    const onclickAttr = esIAAS.includes(p.id) ? `irAMeta5('${p.id}')` : `showPage('${p.id}',document.querySelector('[onclick*=\\'${p.id}\\']'))`;
+    return `<div class="paq-card" onclick="${onclickAttr}">
       <div class="paq-card-header">
         <div class="paq-icon" style="background:${p.bg}">${p.icon}</div>
         <div><div class="paq-title">${p.label}</div><div class="paq-sub">${p.desc} · Meta ≥${p.meta}%</div></div>
